@@ -88,7 +88,7 @@ Vagrant.configure("2") do |config|
     sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
     # Install app dependencies
     cd /vagrant
-    # sudo pip3 install -r requirements.txt
+    sudo pip3 install -r requirements.txt
     # cd /vagrant/libsvm
     # make
     # cd /vagrant/libsvm/python
