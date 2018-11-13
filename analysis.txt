@@ -1,3 +1,0 @@
-There are on an average 55 .h5 files in each subfolder which are A-Z, contained in yet another subfolder A-Z, which are in turn contained in another subfolder A-Z, which makes 26*26*26*(assumed average)55 = 0.96 million files.
-
-Thus each h5 file describes one song
