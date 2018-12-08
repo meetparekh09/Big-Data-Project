@@ -1,0 +1,36 @@
+Creating 1_gram Table:
+    create external table 1_gram_data (1_gram string, year int, match_count int, volume_count int) row format delimited fields terminated by '\t' location '/user/mbp367/project/data/1-gram';
+
+Creating 2_gram Table:
+    create external table 2_gram_data (2_gram string, year int, match_count int, volume_count int) partitioned by (alphabet string) row format delimited fields terminated by '\t';
+
+Loading Partitions of 2_gram Table:
+    alter table 2_gram_data add partition(alphabet='number') location '/user/mbp367/project/data/2-gram/2-gram-001';
+    alter table 2_gram_data add partition(alphabet='a') location '/user/mbp367/project/data/2-gram/2-gram-002';
+    alter table 2_gram_data add partition(alphabet='b') location '/user/mbp367/project/data/2-gram/2-gram-003';
+    alter table 2_gram_data add partition(alphabet='c') location '/user/mbp367/project/data/2-gram/2-gram-004';
+    alter table 2_gram_data add partition(alphabet='d') location '/user/mbp367/project/data/2-gram/2-gram-005';
+    alter table 2_gram_data add partition(alphabet='e') location '/user/mbp367/project/data/2-gram/2-gram-006';
+    alter table 2_gram_data add partition(alphabet='f') location '/user/mbp367/project/data/2-gram/2-gram-007';
+    alter table 2_gram_data add partition(alphabet='g') location '/user/mbp367/project/data/2-gram/2-gram-008';
+    alter table 2_gram_data add partition(alphabet='h') location '/user/mbp367/project/data/2-gram/2-gram-009';
+    alter table 2_gram_data add partition(alphabet='i') location '/user/mbp367/project/data/2-gram/2-gram-010';
+    alter table 2_gram_data add partition(alphabet='j') location '/user/mbp367/project/data/2-gram/2-gram-011';
+    alter table 2_gram_data add partition(alphabet='k') location '/user/mbp367/project/data/2-gram/2-gram-012';
+    alter table 2_gram_data add partition(alphabet='l') location '/user/mbp367/project/data/2-gram/2-gram-013';
+    alter table 2_gram_data add partition(alphabet='m') location '/user/mbp367/project/data/2-gram/2-gram-014';
+    alter table 2_gram_data add partition(alphabet=’n’) location '/user/mbp367/project/data/2-gram/2-gram-015';
+    alter table 2_gram_data add partition(alphabet='o') location '/user/mbp367/project/data/2-gram/2-gram-016';
+    alter table 2_gram_data add partition(alphabet='p') location '/user/mbp367/project/data/2-gram/2-gram-017';
+    alter table 2_gram_data add partition(alphabet='q') location '/user/mbp367/project/data/2-gram/2-gram-018';
+    alter table 2_gram_data add partition(alphabet='r') location '/user/mbp367/project/data/2-gram/2-gram-019';
+    alter table 2_gram_data add partition(alphabet='s') location '/user/mbp367/project/data/2-gram/2-gram-020';
+    alter table 2_gram_data add partition(alphabet='t') location '/user/mbp367/project/data/2-gram/2-gram-021';
+    alter table 2_gram_data add partition(alphabet='u') location '/user/mbp367/project/data/2-gram/2-gram-022';
+    alter table 2_gram_data add partition(alphabet='v') location '/user/mbp367/project/data/2-gram/2-gram-023';
+    alter table 2_gram_data add partition(alphabet='w') location '/user/mbp367/project/data/2-gram/2-gram-024';
+    alter table 2_gram_data add partition(alphabet='x') location '/user/mbp367/project/data/2-gram/2-gram-025';
+    alter table 2_gram_data add partition(alphabet='y') location '/user/mbp367/project/data/2-gram/2-gram-026';
+    alter table 2_gram_data add partition(alphabet='z') location '/user/mbp367/project/data/2-gram/2-gram-027';
+
+Code for shuffling and getting sample data ready is in shuffle_data.sh
