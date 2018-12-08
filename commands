@@ -1,8 +1,12 @@
 Creating 1_gram Table:
     create external table 1_gram_data (1_gram string, year int, match_count int, volume_count int) row format delimited fields terminated by '\t' location '/user/mbp367/project/data/1-gram';
 
+======================================================================================================================
+
 Creating 2_gram Table:
     create external table 2_gram_data (2_gram string, year int, match_count int, volume_count int) partitioned by (alphabet string) row format delimited fields terminated by '\t';
+
+======================================================================================================================
 
 Loading Partitions of 2_gram Table:
     alter table 2_gram_data add partition(alphabet='number') location '/user/mbp367/project/data/2-gram/2-gram-001';
@@ -33,4 +37,119 @@ Loading Partitions of 2_gram Table:
     alter table 2_gram_data add partition(alphabet='y') location '/user/mbp367/project/data/2-gram/2-gram-026';
     alter table 2_gram_data add partition(alphabet='z') location '/user/mbp367/project/data/2-gram/2-gram-027';
 
-Code for shuffling and getting sample data ready is in shuffle_data.sh
+======================================================================================================================
+
+Code for shuffling and getting sample data ready is in shuffle_data.sh:
+    sum=0
+    file=$1
+    div=$2
+    path=$3
+
+    `truncate -s 0 $file`
+
+    for f in $path
+    do
+        lines=`wc -l $f | awk '{print $1}'`
+        N=$((lines/div))
+        sum=$((sum+N))
+        printf -v c "Shuffling data from $f and saving $N lines to $file"
+        echo $c
+        `shuf -n $N $f >> $file`
+    done
+    echo $sum
+
+======================================================================================================================
+
+
+First Model:
+    Removed all files with punctuation, pos, other and numbers.
+    Take year >= 2000:
+        create table temp1(1_gram string, year int, match_count int, volume_count int);
+        insert into temp1 select * from 1_gram_data where year >= 2000;
+
+    Remove tags and convert to lower:
+        create table temp2(1_gram string, year int, match_count int, volume_count int);
+        insert into temp2 select lower(split_part(1_gram, '_', 1)), year, match_count, volume_count from temp1;
+
+    Take length of word greater than 2:
+    create table temp3(1_gram string, year int, match_count int, volume_count int);
+    insert into temp3 select * from temp2 where length(1_gram) > 2;
+
+
+    Take frequency of all terms:
+        create table temp4(1_gram string, frequency bigint);
+        insert into temp4 select 1_gram, sum(match_count) from temp3 group by 1_gram;
+
+    Take frequency greater than average:
+        find average by: select avg(frequency) from temp4;
+        create table temp5(1_gram string, frequency bigint);
+        insert into temp5 select * from temp4 where frequency >= average;
+
+    Take Probabilities:
+        find total by: select sum(frequency) from temp5;
+        create table temp6(1_gram string, prob double);
+        insert into temp6 select 1_gram, frequency/total from temp5;
+
+    Insert this into external directory:
+        create external table 1_gram_probability(1_gram string, prob double) row format delimited fields terminated by '\t' location '/user/mbp367/project/1_gram_probability';
+        insert into 1_gram_probability select * from temp6;
+
+    Clean:
+        drop table temp1;
+        drop table temp2;
+        drop table temp3;
+        drop table temp4;
+        drop table temp5;
+        drop table temp6;
+
+    Copy files from 1_gram_probability to our program directory.
+
+======================================================================================================================
+
+Second Model:
+    Remove all files with num i.e. 2-gram-001, punctuation, other, pos.
+
+    Split 1_gram and 2_gram for year >= 2000:
+        create table temp1(1_gram string, 2_gram string, year int, match_count int, volume_count int);
+        insert into temp1 select split_part(2_gram, ' ', 1), split_part(2_gram, ' ', 2), year, match_count, volume_count from 2_gram_data where year >= 2000;
+
+    Ignore the ones starting with non-alpha numeric:
+        create table temp2(1_gram string, 2_gram string, year int, match_count int, volume_count int);
+        insert into temp2 select * from temp1 where 2_gram rlike "^[a-zA-Z].*" and 1_gram rlike "^[a-zA-Z].*";
+
+    Remove tags and convert to lower:
+        create table temp3(1_gram string, 2_gram string, year int, match_count int, volume_count int);
+        insert into temp3 select lower(split_part(1_gram, '_', 1)), lower(split_part(2_gram, '_', 1)), year, match_count, volume_count from temp2;
+
+    Merge Strings and check length of each gram > 2:
+        create table temp4(2_gram string, year int, match_count int, volume_count int);
+        insert into temp4 select concat_ws(' ', 1_gram, 2_gram), year, match_count, volume_count from temp3 where length(1_gram) > 2 and length(2_gram) > 2;
+
+    Take Frequency:
+        create table temp5(2_gram string, frequency bigint);
+        insert into temp5 select 2_gram, sum(match_count) from temp4 group by 2_gram;
+
+    Split grams and take greater than average frequency:
+        Find average: select avg(frequency) from temp5;
+        create table temp6(1_gram string, 2_gram string, frequency bigint);
+        insert into temp6 select split_part(2_gram, ' ', 1), split_part(2_gram, ' ', 2), frequency from temp5 where frequency >= 2660;
+
+    Take Probability:
+        Find total: select sum(frequency) from temp6;
+        create table temp7(1_gram string, 2_gram string, prob double);
+        insert into temp7 select 1_gram, 2_gram, frequency/179184662819 from temp6;
+
+    Insert into external table:
+        create external table 2_gram_probability(1_gram string, 2_gram string, prob double) row format delimited fields terminated by '\t' location '/user/mbp367/project/2_gram_probability';
+        insert into 2_gram_probability select * from temp7;
+
+    Clean:
+        drop table temp1;
+        drop table temp2;
+        drop table temp3;
+        drop table temp4;
+        drop table temp5;
+        drop table temp6;
+        drop table temp7;
+
+    Copy files from external table to program directory
