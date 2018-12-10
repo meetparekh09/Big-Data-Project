@@ -61,7 +61,7 @@ Code for shuffling and getting sample data ready is in shuffle_data.sh:
 ======================================================================================================================
 
 
-First Model:
+1_gram:
     Removed all files with punctuation, pos, other and numbers.
     Take year >= 2000:
         create table temp1(1_gram string, year int, match_count int, volume_count int);
@@ -106,7 +106,7 @@ First Model:
 
 ======================================================================================================================
 
-Second Model:
+2_gram:
     Remove all files with num i.e. 2-gram-001, punctuation, other, pos.
 
     Split 1_gram and 2_gram for year >= 2000:
@@ -153,3 +153,11 @@ Second Model:
         drop table temp7;
 
     Copy files from external table to program directory
+
+======================================================================================================================
+
+First Model:
+    Take into account only one_gram_probability, and try to find top 10 words with prefix matching and see if our word is in there.
+    Observed results: 49.71% keystroke reduction
+
+    
