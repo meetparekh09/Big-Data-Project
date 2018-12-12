@@ -72,6 +72,13 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
 
+  if File.exists?(File.expand_path("~/.ssh/config"))
+      config.vm.provision "file", source: "~/.ssh/config", destination: "~/.ssh/config"
+  end
+
+  if File.exists?(File.expand_path("~/.ssh/known_hosts"))
+      config.vm.provision "file", source: "~/.ssh/known_hosts", destination: "~/.ssh/known_hosts"
+  end
   ######################################################################
   # Add Python Flask environment
   ######################################################################
@@ -80,6 +87,7 @@ Vagrant.configure("2") do |config|
     apt-get update
     apt-get install python3.6
     apt-get install python3-setuptools
+    apt-get install asciinema
     easy_install3 pip
     # apt-get install -y git python-pip python-dev build-essential
     pip install --upgrade pip

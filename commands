@@ -158,6 +158,6 @@ Code for shuffling and getting sample data ready is in shuffle_data.sh:
 
 First Model:
     Take into account only one_gram_probability, and try to find top 10 words with prefix matching and see if our word is in there.
-    Observed results: 49.71% keystroke reduction
-
-    
+        python3 model1.py
+        Observed results in Figure_2.png
+        Also, average response time in seconds: 0.019977546679902036

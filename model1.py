@@ -3,6 +3,8 @@ import sys
 import heapq
 import re
 import time
+import matplotlib.pyplot as plt
+import math
 
 base = '1_gram_probability/'
 files = os.listdir(base)
@@ -118,7 +120,14 @@ for i in times:
     print("===================================================================================================================")
     print()
 
+average = sum(avg_response_times) / len(avg_response_times)
+# times = [math.log10(x) for x in times]
+
+print("===================================================================================================================")
+print("\t\tAverage response time per character :: " + str(average))
+print("===================================================================================================================")
+
 
 print(times)
-print(avg_response_times)
+print(average)
 print(predictions)
